@@ -11,5 +11,5 @@ export class QuizzComponent {
   title:string = ""
 
   questions: any
-  questionSelected: any 
+  questionSelected: any
 }
