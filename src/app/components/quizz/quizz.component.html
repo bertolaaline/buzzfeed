@@ -9,13 +9,17 @@
     </div>
 
     <div class="quizz_options">
-        <button class="btn-option">
-            optionname
+        @for (option of questionSelected.options; track $index) {
+        <button (click)="buttonPress(option.alias)" class="btn-option">
+            {{option.name}}
         </button>
+    }
     </div>
-    
-    <div class="quizz_results">
-        <h1>O seu resultado é</h1>
-        <p>Resposta Selecionada</p>
-    </div>
+
+    @if (finished) {
+        <div class="quizz_results">
+            <h1>O seu resultado é</h1>
+            <p>Resposta Selecionada</p>
+        </div>
+    }
 </div>
