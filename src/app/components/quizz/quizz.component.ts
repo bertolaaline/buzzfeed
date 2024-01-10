@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal, computed } from '@angular/core';
 import quizz_questions from './../../../assets/data/quizz_questions.json'
 
 @Component({
@@ -10,38 +10,50 @@ import quizz_questions from './../../../assets/data/quizz_questions.json'
 })
 export class QuizzComponent {
   title:string
-  questionIndex:number
+  questionIndex = signal(0)
   questionMaxIndex:number
 
   questions: any
-  questionSelected: any 
+  questionSelected = computed(() => this.questions[this.questionIndex()])
 
   answers:string[] = []
   answerSelected:string= ""
   
-  finished:boolean
+  finished = signal(false)
 
   constructor () {
     this.title = quizz_questions.title
     this.questions = quizz_questions.questions
-    this.questionIndex = 0
-    this.questionSelected = this.questions[this.questionIndex]
-    this.questionMaxIndex = this.questions.length -1
-    this.finished = false
+    this.questionMaxIndex = this.questions.length - 1
 
   }
 
   public buttonPress(alias:string) {
     this.answers.push(alias)
+    this.nextStep()
   } 
 
-  async nextStep() {
-    this.questionIndex+=1
-
-    if(this.questionMaxIndex > this.questionIndex) {
-        this.questionSelected = this.questions[this.questionMaxIndex]
-    }else {
-      this.finished = true
+  public nextStep() {
+    this.questionIndex.update(value => value + 1)
+    
+    if(this.questionIndex() > this.questionMaxIndex) {
+      this.finished.set(true)
+      this.answerSelected = quizz_questions.results[this.checkResult(this.answers) as keyof typeof quizz_questions.results]
     }
   }
+
+  private checkResult(answers:string[]):string {
+    const result = answers.reduce((previous, current, i, arr) => {
+      if (
+        arr.filter(item => item === previous).length >
+        arr.filter(item => item === current).length 
+      ){
+        return previous
+      }else{
+        return current
+      }
+    })
+
+    return result
+  } 
 }
